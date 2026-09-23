@@ -1,0 +1,17 @@
+bindPort = 7000
+
+vhostHTTPPort = 20001
+vhostHTTPSPort = 20000
+subdomainHost = "frpclient.local"
+
+[webServer]
+addr = "0.0.0.0"
+port = 9800
+user = "admin"
+password = "PassWord"
+
+[[httpPlugins]]
+name = "my-auth"
+addr = "127.0.0.1:8089"
+path = "/handler"
+ops = ["Login","Ping"]

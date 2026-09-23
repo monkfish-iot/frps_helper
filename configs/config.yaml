@@ -1,0 +1,66 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Monkfish
+
+# frps_helper 配置文件
+
+# 数据库配置（默认 SQLite）
+database:
+  type: sqlite                    # sqlite | postgres
+  file: "./data/frps_helper.db"   # SQLite 文件路径
+  # PostgreSQL 专用字段（type: postgres 时使用）
+  host: "localhost"
+  port: 5432
+  username: "postgres"
+  password: ""
+  database: "frps_helper"
+  sslmode: "disable"
+  max_idle_conns: 10
+  max_open_conns: 100
+
+# FRPC 服务配置（已从 extensions.frpc 提升为顶层）
+frpc:
+  enable: true
+  auto_register: true             # 是否允许设备首次 join 时自动注册
+
+  # FRPS 认证 HTTP 端口（frps 配置 addr = "127.0.0.1:8089"）
+  port: 8089
+  auth_bind: "127.0.0.1"          # 绑定地址，默认 127.0.0.1（仅本机可访问）
+  auth_whitelist:                 # 访问白名单，支持 IP 或 CIDR，默认 127.0.0.1
+    - "127.0.0.1"
+
+  # FRPS 管理凭证（预留）
+  frps_admin: "admin"
+  frps_password: ""
+  frps_port: 7000
+
+  # 设备管理 HTTPS 端口
+  device_port: 6999
+  device_tls: true
+  device_cert_file: "certs/device-server.crt"
+  device_key_file: "certs/device-server.key"
+
+  # 独立管理 HTTPS 端口（设备查询/批准、配置查看/修改；与设备接口隔离）
+  manage_port: 7443
+  manage_bind: "127.0.0.1"        # 绑定地址，默认 127.0.0.1（仅本机可访问）
+  manage_whitelist:               # 访问白名单，支持 IP 或 CIDR，默认 127.0.0.1
+    - "127.0.0.1"
+
+  # 下发给设备的 xfrpc 服务端地址
+  xfrpc_server_addr: "127.0.0.1"
+  xfrpc_server_port: 7000
+
+  # 设备状态上报周期（秒）
+  status_interval: 60
+
+  # 会话超时（秒），不填则自动取 status_interval * 3
+  session_ttl: 180
+  credential_query: true   # 默认 false=关闭
+  # credential_token: "xxxx" # 可选，设置后必须带此 Bearer 令牌
+# 日志配置
+log:
+  level: "info"                   # debug | info | warn | error
+  output: "stdout"                # stdout | file
+  file_path: "./logs/frps_helper.log"
+  max_size: 100                   # MB
+  max_backups: 7
+  max_age: 30                     # days

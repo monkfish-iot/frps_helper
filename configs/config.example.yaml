@@ -1,0 +1,96 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Monkfish
+
+server:
+  host: "0.0.0.0"
+  port: 8099
+  mode: "release"
+
+database:
+  host: "localhost"
+  port: 5432
+  username: "postgres"
+  password: "postgres"
+  database: "uniax"
+  sslmode: "disable"
+  max_idle_conns: 10
+  max_open_conns: 100
+
+casdoor:
+  enabled: "false"
+  endpoint: "http://localhost:8000"
+  client_id: "your_client_id"
+  client_secret: "your_client_secret"
+  certificate: "path/to/certificate"
+  organization: "your_org"
+  application: "your_app"
+  redirect_uri: "http://localhost:8099/callback"
+
+south:
+  heartbeat_interval: 30
+  device_timeout: 120
+  batch_size: 100
+  api_key_header: "API-Key"
+
+tenant:
+  default_org_id: "default"
+  enable_multi_tenant: true
+  special_org_ids:
+    admin_org_id: "admin"
+    unassigned_org_id: "unassigned"
+  business_admin_users:
+    - "admin"
+
+cache:
+  enabled: "true"
+  type: "memory"
+  ttl: 5
+  max_size: 10000
+
+rate_limit:
+  north:
+    enabled: true
+    qps: 100
+  south:
+    enabled: true
+    qps: 1000
+
+bind:
+  enable_row_lock: false
+
+partition:
+  enabled: "false"
+  partition_type: "daily"
+
+log:
+  level: "info"
+  output: "stdout"
+  file_path: "/var/log/uniax/uniax.log"
+  max_size: 100
+  max_backups: 10
+  max_age: 30
+
+extensions:
+  frpc:
+    enable: false
+    port: 8089
+    auth_bind: "127.0.0.1"        # 认证端口绑定地址，默认 127.0.0.1（仅本机可访问）
+    auth_whitelist:               # 认证端口访问白名单（IP 或 CIDR），默认 127.0.0.1
+      - "127.0.0.1"
+    frps_admin: "admin"
+    frps_password: "your_frps_password"
+    frps_port: 8089
+    # 设备管理服务器（xfrpc_loader 服务端，与 FRPC 扩展一体，enable=false 时不启动）
+    device_port: 6999            # 监听端口，默认 6999
+    device_tls: true             # 默认 HTTPS。证书路径留空/文件缺失时，启动自动生成 ECDSA(P-256) 自签证书到 certs/device-server.{crt,key}，有效期 1 年
+    device_cert_file: "certs/device-server.crt" # 用户证书路径；留空且 device_tls=true 时回退自动生成
+    device_key_file:  "certs/device-server.key" # 用户私钥路径；留空且 device_tls=true 时回退自动生成
+    manage_port: 7443             # 独立管理 HTTPS 端口（设备查询/批准、配置查看/修改），默认 7443
+    manage_bind: "127.0.0.1"      # 管理端口绑定地址，默认 127.0.0.1（仅本机可访问）
+    manage_whitelist:             # 管理端口访问白名单（IP 或 CIDR），默认 127.0.0.1
+      - "127.0.0.1"
+    xfrpc_server_addr: "127.0.0.1" # 下发给设备的 xfrpc(frps) 服务端地址；自签证书会把它也加入 SANs
+    xfrpc_server_port: 7000       # 下发给设备的 xfrpc(frps) bind_port
+    status_interval: 60           # 设备状态上报周期（秒）
+    session_ttl: 180              # 会话超时（秒），默认 status_interval*3
+    ac_api_key: ""                # AC 系统 API Key，用于南向函数接口上报设备心跳
